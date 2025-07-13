@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+motor
+python-dotenv
+dotenv
+bs4
+pdfminer
