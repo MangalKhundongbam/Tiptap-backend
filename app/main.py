@@ -3,9 +3,15 @@ from fastapi.responses import JSONResponse, FileResponse # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from pdfminer.high_level import extract_text # type: ignore
 from bs4 import BeautifulSoup # type: ignore
+from pymongo import MongoClient # type: ignore
 import os
 
 app = FastAPI()
+
+# MongoDB client setup
+client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.5")  # Replace with your connection string
+db = client["Demo"]
+collection = db["HtmlList"]
 
 # Enable CORS for frontend access (adjust origin if needed)
 app.add_middleware(
@@ -39,8 +45,18 @@ async def process_pdf(file: UploadFile = File(...)):
         with open("output.html", "w", encoding="utf-8") as f:
             f.write(pretty_html)
 
+        # Store HTML in MongoDB
+        document = {
+            "filename": file.filename,
+            "html": pretty_html
+        }
+        result = collection.insert_one(document)
+
         # Return the HTML to frontend for Tiptap
-        return JSONResponse({"html": pretty_html})
+        return JSONResponse({
+            "message": "html inserted in Mongodb database",
+            "insertedid": str(result.inserted_id),
+            "html": pretty_html})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 
