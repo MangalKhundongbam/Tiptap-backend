@@ -6,3 +6,4 @@ dotenv
 bs4
 pdfminer
 bcrypt
+aiohttp
