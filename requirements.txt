@@ -4,5 +4,5 @@ motor
 python-dotenv
 dotenv
 bs4
-pdfminer
+pdfminer.six
 bcrypt
